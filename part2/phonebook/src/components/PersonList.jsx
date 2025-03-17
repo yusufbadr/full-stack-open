@@ -1,12 +1,12 @@
 import Person from "./Person"
 
 const PersonList = (props) => {
-    const { persons } = props
+    const { persons, handleDeletePerson } = props
 
     return (
         <div>
             {persons.map((person) =>
-                <Person key={person.id} name={person.name} phoneNumber={person.phoneNumber} />
+                <Person key={person.id} name={person.name} phoneNumber={person.number} handleDeletePerson={() => handleDeletePerson(person.id)} />
             )}
         </div>
     )
