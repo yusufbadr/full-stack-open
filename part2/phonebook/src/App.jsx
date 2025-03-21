@@ -3,13 +3,16 @@ import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
 import PersonList from './components/PersonList'
 import personService from './services/persons'
-
+import Notification from './components/Notification'
+import './index.css';
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newPhoneNumber, setNewPhoneNumber] = useState('')
   const [newQueryName, setNewQueryName] = useState('')
+  const [notification, setNotification] = useState({message: null, type: null})
+
 
   useEffect(() => {
     personService
@@ -39,6 +42,21 @@ const App = () => {
             setPersons(persons.map(person =>
               person.id !== exisitingPerson.id ? person : returnedPerson
             ))
+
+            setNotification({
+              message: `New number updated successfully`,
+              type: `success`,
+            })
+
+            setTimeout(() => setNotification({ message: null, type: null}), 5000)
+          }) 
+          .catch(error => {
+            setNotification({
+              message: `Information of ${newName} has already been removed from the server`,
+              type: `error`,
+            })
+            setTimeout(() => setNotification({ message: null, type:null}), 5000)
+            setPersons(persons.filter(p => p.id !== exisitingPerson.id))
           })
       }
     } else {
@@ -46,6 +64,13 @@ const App = () => {
         .create(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
+
+          setNotification({
+            message: `Added ${newName}`,
+            type: `success`,
+          })
+  
+          setTimeout(() => setNotification({message: null, type: null}), 5000)
         })
 
     }
@@ -72,6 +97,20 @@ const App = () => {
       .deletePerson(id)
       .then(deletedPerson => {
         setPersons(persons.filter(person => person.id != deletedPerson.id))
+        setNotification({
+          message: `Deleted ${deletedPerson.name}`,
+          type: 'success'
+        })
+        setTimeout(() => setNotification({ message: null, type: null }), 5000)
+      })
+      .catch(error => {
+        const person = persons.find(p => p.id === id)
+        setNotification({
+          message: `Information of ${person.name} has already been removed from server`,
+          type: 'error'
+        })
+        setTimeout(() => setNotification({ message: null, type: null}), 5000)
+        setPersons(persons.filter(p => p.id !== id))
       })
   }
 
@@ -82,6 +121,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
+      <Notification message={notification.message} type={notification.type} />
 
       <Filter
         newQueryName={newQueryName}
