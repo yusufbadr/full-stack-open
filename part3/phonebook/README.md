@@ -1,1 +1,1 @@
-Link to online application: http://69.62.106.202:3001/
+Link to online application: https://phonebook-fso.duckdns.org/
