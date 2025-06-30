@@ -51,12 +51,19 @@ const App = () => {
             setTimeout(() => setNotification({ message: null, type: null}), 5000)
           }) 
           .catch(error => {
-            setNotification({
-              message: `Information of ${newName} has already been removed from the server`,
-              type: `error`,
-            })
+            if (error.response && error.response.status === 400){
+              setNotification({
+                message: error.response.data.error,
+                type: 'error',
+              })
+            } else {
+              setNotification({
+                message: `Information of ${newName} has already been removed from the server`,
+                type: `error`,
+              })
+              setPersons(persons.filter(p => p.id !== exisitingPerson.id))
+            }
             setTimeout(() => setNotification({ message: null, type:null}), 5000)
-            setPersons(persons.filter(p => p.id !== exisitingPerson.id))
           })
       }
     } else {
@@ -71,10 +78,15 @@ const App = () => {
           })
   
           setTimeout(() => setNotification({message: null, type: null}), 5000)
+        }).catch(error => {
+          setNotification({
+            message: error.response.data.error,
+            type: 'error'
+          })
+          setTimeout(() => setNotification({message: null, type: null}), 5000)
         })
 
     }
-
 
     setNewName('')
     setNewPhoneNumber('')
